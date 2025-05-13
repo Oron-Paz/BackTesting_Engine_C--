@@ -5,30 +5,43 @@
 double cash = 10000.0;
 const int RSI_PERIOD = 14;
 
-double simulateRSIStrategy( const std::vector<csv_loader::PriceData>& data, const std::vector<double>& rsi, int rsiPeriod, double startingCash, double bottomThreshold, double topThreshold, std::vector<TradeLog>& logs){
-    int current_period = RSI_PERIOD; //we want to start when we already have RSI values.
-    for(size_t current_period = RSI_PERIOD; current_period < data.size(); current_period++) {
-        TradeLog currentDateLog;
-        double stockPrice = data[current_period].close;
+double simulateRSIStrategy(const std::vector<csv_loader::PriceData>& data,const std::vector<double>& rsi,int rsiPeriod,double startingCash,double bottomThreshold,double topThreshold,std::vector<TradeLog>& logs){
+    double cash = startingCash;
+    int sharesHeld = 0;
 
-        currentDateLog.date = data[current_period].date;
-        currentDateLog.price = data[current_period].close;
+    for (size_t i = rsiPeriod; i < data.size(); ++i) {
+        double stockPrice = data[i].close;
+        TradeLog log;
+        log.date = data[i].date;
+        log.price = stockPrice;
 
-        if (rsi[current_period] < bottomThreshold){
-            int sharesAffordable = cash / stockPrice;
-            int cashLeftover = cash - stockPrice * sharesAffordable;
-            
-            currentDateLog.action = "BUY";
-            if(current_period > 0 ){
+        if (rsi[i] < bottomThreshold && cash >= stockPrice) {
+            // BUY
+            int sharesToBuy = cash / stockPrice;
+            double cost = sharesToBuy * stockPrice;
 
-            }else{
-                
-            }
-            currentDateLog.shares =;
-            
-            
+            cash -= cost;
+            sharesHeld += sharesToBuy;
+
+            log.action = "BUY";
+            log.shares = sharesToBuy;
+        } else if (rsi[i] > topThreshold && sharesHeld > 0) {
+            // SELL
+            double proceeds = sharesHeld * stockPrice;
+
+            cash += proceeds;
+
+            log.action = "SELL";
+            log.shares = sharesHeld;
+            sharesHeld = 0;
+        } else {
+            // HOLD
+            log.action = "HOLD";
+            log.shares = 0;
         }
+
+        logs.push_back(log);
     }
 
-    return 0;
+    return cash + (sharesHeld * data.back().close);
 }
