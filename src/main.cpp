@@ -8,7 +8,7 @@
 #include <string>
 
 int main(){
-    std::vector<csv_loader::PriceData> data = csv_loader::getData("../data/historical.csv");
+    std::vector<csv_loader::PriceData> data = csv_loader::getData("../data/historical_NIKE.csv");
     int period = 14;
 
     std::reverse(data.begin(), data.end());
@@ -18,7 +18,7 @@ int main(){
     
     bool printLogs = true;
 
-    double simulationRSIResult = strategy::simulateRSIStrategy(data, rsi_values, 14, 100000, 100, 100, trade_logs, printLogs);
+    double simulationRSIResult = strategy::simulateRSIStrategy(data, rsi_values, 14, 1000, 40, 70, trade_logs, printLogs);
     
     
     std::cout << simulationRSIResult << " <- This is how much money we made using our strategy \n";
