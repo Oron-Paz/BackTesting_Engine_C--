@@ -58,7 +58,7 @@ std::vector<double> calculateRSI(const std::vector<csv_loader::PriceData>& data,
         avg_gain = ((avg_gain * (period - 1)) + gain) / period;
         avg_loss = ((avg_loss * (period - 1)) + loss) / period;
 
-        std::cout << "Initial avg_gain: " << avg_gain << " avg_loss: " << avg_loss << std::endl;
+        //std::cout << "Initial avg_gain: " << avg_gain << " avg_loss: " << avg_loss << std::endl;
         
         relative_strength = avg_gain / avg_loss;
         rsi = 100 - (100 / (1 + relative_strength));
